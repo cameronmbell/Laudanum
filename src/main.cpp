@@ -1,3 +1,17 @@
+#include "laudanum/Fwindow.hpp"
+#include "laudanum/FExcept.hpp"
+
+int main(int argc, char* argv[]) {
+    FWindow::init();
+
+    for (;;) {
+        
+    }
+
+    return 0;
+}
+
+/*
 struct Scene;
 struct Event;
 struct RawEvent;
@@ -29,3 +43,4 @@ int main(int argc, char* argv[]) {
     for (;;) {
     }
 }
+*/
