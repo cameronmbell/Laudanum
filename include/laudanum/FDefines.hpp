@@ -1,16 +1,14 @@
 #ifndef _F_DEFINES_HPP
 #define _F_DEFINES_HPP
 
+// project properties, should grab from cmake
 #define FPROJECT_NAMEU "LAUDANUM"
 #define FPROJECT_NAMEC "Laudanum"
 #define FPROJECT_NAMEL "laudanum"
 
-#define FWINDOW_FALLBACK_W 1280
-#define FWINDOW_FALLBACK_H 720
-
 // from:
-// Stackoverflow: How to detect reliably Mac OS X, iOS, Linux, Windows in C preprocessor?
-// Answer by: Evgeny Gavrin
+// stackoverflow: How to detect reliably Mac OS X, iOS, Linux, Windows in C preprocessor?
+// answer by: Evgeny Gavrin
 #ifdef _WIN32
 #define FOS_WIN
 #ifdef _WIN64
@@ -37,6 +35,25 @@
 #define FOS_POSIX
 #else
 #error "Unknown compiler"
+#endif
+
+// determine compiler
+#if defined(__clang__)
+#define FCMP_CLANG
+#elif defined(__ICC) || defined(__INTEL_COMPILER)
+#define FCMP_INTEL
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define FCMP_GNU
+#elif defined(__HP_cc) || defined(__HP_aCC)
+#define FCMP_HP
+#elif defined(__IBMC__) || defined(__IBMCPP__)
+#define FCMP_IBM
+#elif defined(_MSC_VER)
+#define FCMP_MSC
+#elif defined(__PGI)
+#define FCMP_PORTLAND
+#elif defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+#define FCMP_ORACLE
 #endif
 
 #endif

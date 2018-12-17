@@ -4,10 +4,6 @@
 int main(int argc, char* argv[]) {
     FWindow::init();
 
-    for (;;) {
-        
-    }
-
     return 0;
 }
 

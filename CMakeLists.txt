@@ -30,6 +30,14 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 message(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLFW3_LIBRARY})
 
+# set warning level to maximum
+if ( CMAKE_COMPILER_IS_GNUCC )
+    target_compile_options(${PROJECT_NAME} PRIVATE "-Wall")
+endif()
+if ( MSVC )
+    target_compile_options(${PROJECT_NAME} PRIVATE "/W4")
+endif()
+
 # compile GLAD
 add_library("glad" ${DEPENDENCIES_ROOT}/src/glad.c)
 

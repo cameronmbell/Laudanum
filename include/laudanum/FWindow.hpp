@@ -8,6 +8,7 @@
 
 namespace FWindow {
     GLFWwindow* init();
+    void destroy(GLFWwindow* window);
 };
 
 #endif

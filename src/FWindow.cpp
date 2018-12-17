@@ -2,9 +2,12 @@
 #include "laudanum/Fexcept.hpp"
 #include "laudanum/FDefines.hpp"
 
+#define FWINDOW_FALLBACK_W 1280
+#define FWINDOW_FALLBACK_H 720
+
 namespace FWindow {
     void glfwErrorCallback(int error_code, const char* description) {
-        Flog("GLFW error %d:%s", error_code, description);
+        FErr("GLFW error %d:%s", error_code, description);
     }
 
     GLFWwindow* init() {
@@ -13,7 +16,7 @@ namespace FWindow {
         glfwSetErrorCallback(glfwErrorCallback);
 
         if (!glfwInit()) {
-            Flog("Could not initialize GLFW (used to create the window)");
+            FErr("Could not initialize GLFW (used to create the window)");
 
             return nullptr;
         }
@@ -27,8 +30,11 @@ namespace FWindow {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* vidmode = glfwGetVideoMode(monitor);
 
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+
         if (!vidmode) {
-            Flog("Unable to get the primary monitor's video mode, using fallback resolution");
+            FWarn("Unable to get the primary monitor's video mode, using fallback resolution");
 
             window = glfwCreateWindow(FWINDOW_FALLBACK_W, FWINDOW_FALLBACK_W, FPROJECT_NAMEC, monitor, nullptr);
         } else {
@@ -41,13 +47,23 @@ namespace FWindow {
         }
 
         if (!window) {
-            Flog("Unable to create window, see related GLFW errors");
+            FErr("Unable to create window, see related GLFW errors");
 
             glfwTerminate();
 
             return nullptr;
         }
 
+        while (!glfwWindowShouldClose(window)) {
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
+
         return window;
+    }
+
+    void destroy(GLFWwindow* window) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
     }
 }
