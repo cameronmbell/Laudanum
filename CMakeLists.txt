@@ -9,10 +9,12 @@ set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(HDR_DIR "${CMAKE_SOURCE_DIR}/include")
 set(SOURCES
     ${SRC_DIR}/FExcept.cpp
+    ${SRC_DIR}/FInputListener.cpp
     ${SRC_DIR}/FWindow.cpp
     ${SRC_DIR}/main.cpp
     ${HDR_DIR}/laudanum/FDefines.hpp
     ${HDR_DIR}/laudanum/FExcept.hpp
+    ${HDR_DIR}/laudanum/FInputListener.hpp
     ${HDR_DIR}/laudanum/FWindow.hpp
 )
 

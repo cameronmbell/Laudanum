@@ -2,41 +2,70 @@
 #include "laudanum/FExcept.hpp"
 
 int main(int argc, char* argv[]) {
-    FWindow::init();
+    auto window = FWindow::create();
+
+    for (;;) {
+        FInputEvent event;
+        while (window->getEvent(event)) {
+            if (event.type == FInputType::WIN_CLOSE)
+                goto cleanup;
+        }
+    }
+
+cleanup:
 
     return 0;
 }
 
+// A possible architecture taken from youtube...
 /*
-struct Scene;
-struct Event;
-struct RawEvent;
-struct Window;
-struct Scene {
-    virtual Scene* update(double delta_time)=0;
-    virtual Scene* handleEvent(const Event& event)=0;
-    virtual void render(Window& window) const=0;
-    virtual ~Scene();
-};
-
-struct Config {
-    void load() {
-        // read config file
-    }
-
-    bool parseEvent(const RawEvent& rawEvent, Event& event) {
-        return false;
-    }
-};
-
-Config gConfig;
-
 int main(int argc, char* argv[]) {
-    gConfig.load();
-
-    Scene* scene = nullptr;
+    Scene* scene = new Menu();
+    Window window();
 
     for (;;) {
+        scene->render(window);
+
+        RawEvent raw_event;
+        while (window.getEvent(raw_event)) {
+            GameEvent game_event;
+
+            if (InputMapper::parseEvent(raw_event, game_event)) {
+                scene.handleEvent(raw_event);
+                if (!scene)
+                    return 0;
+            }
+        }
+    }
+
+    return 0;
+}
+
+struct Scene {
+    virtual Scene* update(double delta_time)=0;
+    virtual Scene* handleEvent(const GameEvent& event)=0;
+    virtual void render(Window& window) const=0;
+    virtual ~Scene();
+}
+
+struct InputMapper {
+    Map<RawEvent, GameEvent> event_map;
+
+    InputMapper() {
+        event_map[RawEvent::Escape] = GameEvent::Pause;
+    }
+
+    bool parseEvent(const RawEvent& raw_event, GameEvent& game_event) {
+        if (bindings.contains(raw_event)) {
+            game_event = bindings[raw_event];
+        } else if (raw_event == RawEvent::WindowClose) {
+            game_event = GameEvent::quit;
+        }
+
+        return false;
     }
 }
+
+// todo use singleton
+InputMapper gimap;
 */

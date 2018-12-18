@@ -26,8 +26,8 @@ namespace _details {
     void FRawLog(const char* precursor_text, const char* fmt, ...) FPRINTF_HINT(2, 3);
 };
 
-#define FLog(f_, ...)   _details::FRawLog("INFO", (f_), ##__VA_ARGS__)
-#define FWarn(f_, ...)  _details::FRawLog("WARN", (f_), ##__VA_ARGS__)
-#define FErr(f_, ...)   _details::FRawLog("ERR ", (f_), ##__VA_ARGS__)
+#define FLog(f_, ...)   ::_details::FRawLog("INFO", (f_), ##__VA_ARGS__)
+#define FWarn(f_, ...)  ::_details::FRawLog("WARN", (f_), ##__VA_ARGS__)
+#define FErr(f_, ...)   ::_details::FRawLog("ERR ", (f_), ##__VA_ARGS__)
 
 #endif
