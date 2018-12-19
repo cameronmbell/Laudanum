@@ -26,8 +26,14 @@ namespace _details {
     void FRawLog(const char* precursor_text, const char* fmt, ...) FPRINTF_HINT(2, 3);
 };
 
+#if !defined(FLOG_LEVEL) || FLOG_LEVEL < 1
 #define FLog(f_, ...)   ::_details::FRawLog("INFO", (f_), ##__VA_ARGS__)
+#endif
+#if !defined(FLOG_LEVEL) || FLOG_LEVEL < 2
 #define FWarn(f_, ...)  ::_details::FRawLog("WARN", (f_), ##__VA_ARGS__)
+#endif
+#if !defined(FLOG_LEVEL) || FLOG_LEVEL < 3
 #define FErr(f_, ...)   ::_details::FRawLog("ERR ", (f_), ##__VA_ARGS__)
+#endif
 
 #endif

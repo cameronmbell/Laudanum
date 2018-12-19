@@ -31,9 +31,14 @@ std::unique_ptr<FWindow> FWindow::create() {
         return nullptr;
     }
 
+    glfwWindowHint(GLFW_SAMPLES, 1);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef FOS_APL
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
     // create the window to be fullscreen at the desktop resolution
     GLFWwindow* window;
@@ -57,7 +62,9 @@ std::unique_ptr<FWindow> FWindow::create() {
     }
 
     if (!window) {
-        FErr("Unable to create window, see related GLFW errors");
+        FErr("Unable to create window. "
+             "This is probaby because your GPU doesn't support OpenGL 3.3 "
+             "Otherwise, see the related GLFW error");
 
         glfwTerminate();
 
@@ -72,6 +79,10 @@ std::unique_ptr<FWindow> FWindow::create() {
 
 FWindow::FWindow(GLFWwindow* window) : _window(window) {
     _instance_count++;
+
+    // repeat key events are OS specific and hence ignored
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
+    glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_FALSE);
 
     // setup callbacks so the input listener can store events on a queue
     glfwSetKeyCallback(window, FInputListener::_details::pushKey);

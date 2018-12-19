@@ -1,7 +1,8 @@
 #include "laudanum/FInputListener.hpp"
 #include "laudanum/FExcept.hpp"
 
-#include <GLFW/glfw3.h>
+#define _GLFW_PRESS_HELPER 1
+#define _GLFW_RELEASE_HELPER 0
 
 namespace FInputListener {
 
@@ -10,16 +11,16 @@ double _details::last_mouse_y = 0;
 std::deque<FInputEvent> _details::event_queue;
 
 void _details::pushKey(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (action != GLFW_PRESS && action != GLFW_RELEASE) {
-        FWarn("Unhandled key event for %d (%s)", key, glfwGetKeyName(key, scancode)); 
+    if (action != _GLFW_PRESS_HELPER && action != _GLFW_RELEASE_HELPER) {
+        FWarn("Unhandled key event for %d", key); 
 
         return;
     }
 
     _details::event_queue.push_back(FInputEvent { 
-        /* type= */ (action == GLFW_PRESS) ? (FInputType::KEY_DOWN) : (FInputType::KEY_UP),
-        {.mods=mods},
-        {.button=key}
+        /* type= */ (action == _GLFW_PRESS_HELPER) ? (FInputType::K_DOWN) : (FInputType::K_UP),
+        {.mods=static_cast<FInputMod>(mods)},
+        {.button=static_cast<FInputButton>(key)}
      });
 }
 
@@ -35,16 +36,16 @@ void _details::pushMouseMove(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void _details::pushMouseButton(GLFWwindow* window, int button, int action, int mods) {
-    if (action != GLFW_PRESS && action != GLFW_RELEASE) {
+    if (action != _GLFW_PRESS_HELPER && action != _GLFW_RELEASE_HELPER) {
         FWarn("Unhandled mouse event for MB%d", button); 
 
         return;
     }
 
     _details::event_queue.push_back(FInputEvent { 
-        /* type= */ (action == GLFW_PRESS) ? (FInputType::MB_DOWN) : (FInputType::MB_UP),
-        {.mods=mods},
-        {.button=button}
+        /* type= */ (action == _GLFW_PRESS_HELPER) ? (FInputType::MB_DOWN) : (FInputType::MB_UP),
+        {.mods=static_cast<FInputMod>(mods)},
+        {.button=static_cast<FInputButton>(button)}
      });
 }
 

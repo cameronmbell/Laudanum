@@ -6,6 +6,9 @@
 #define FPROJECT_NAMEC "Laudanum"
 #define FPROJECT_NAMEL "laudanum"
 
+// debug logging
+#define FLOG_LEVEL 0
+
 // from:
 // stackoverflow: How to detect reliably Mac OS X, iOS, Linux, Windows in C preprocessor?
 // answer by: Evgeny Gavrin
@@ -17,13 +20,14 @@
 #define FOS_WIN32
 #endif
 #elif __APPLE__
+#define FOS_APL
 #include "TargetConditionals.h"
 #if TARGET_IPHONE_SIMULATOR
 #define FOS_SIM
 #elif TARGET_OS_IPHONE
 #define FOS_IOS
 #elif TARGET_OS_MAC
-#define FOS_APL
+#define FOS_MAC
 #else
 #error "Unknown Apple platform"
 #endif

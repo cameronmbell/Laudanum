@@ -7,17 +7,32 @@ int main(int argc, char* argv[]) {
     for (;;) {
         FInputEvent event;
         while (window->getEvent(event)) {
-            if (event.type == FInputType::WIN_CLOSE)
+            /**/ if (event.type == FInputType::WIN_CLOSE)
                 goto cleanup;
+            else if (event.type == FInputType::K_DOWN
+                  && event.button == FInputButton::K_ESCAPE 
+                  && !FINPUT_HAS_MOD(event.mods, FInputMod::CONTROL))
+                  goto cleanup;
+            else if (event.type == FInputType::K_DOWN)
+                FLog("Key down on key: %d w/ mods: %d", event.button, event.mods);
+            else if (event.type == FInputType::K_UP)
+                FLog("Key up on key: %d w/ mods: %d", event.button, event.mods);
+            else if (event.type == FInputType::MB_DOWN)
+                FLog("MB down on button: %d w/ mods: %d", event.button, event.mods);
+            else if (event.type == FInputType::MB_UP)
+                FLog("MB up on button: %d w/ mods: %d", event.button, event.mods);
+            else if (event.type == FInputType::M_MOVE)
+                FLog("Mouse move to (%f, %f)", event.x, event.y);
+            else
+                FLog("Unknown event");
         }
     }
 
 cleanup:
-
     return 0;
 }
 
-// A possible architecture taken from youtube...
+// a possible architecture taken from youtube...
 /*
 int main(int argc, char* argv[]) {
     Scene* scene = new Menu();
