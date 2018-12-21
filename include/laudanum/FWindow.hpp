@@ -25,7 +25,10 @@ public:
     static std::unique_ptr<FWindow> create();
 
     // Pop and return any unhandled events on the queue
-    bool getEvent(FInputEvent& input_event);
+    bool getEvent(FInputEvent& input_event) noexcept;
+
+    // Swap the buffer
+    void draw() noexcept;
     
     // Destroy the underling GLFW instance
     // and uninitialize GLFW if possible

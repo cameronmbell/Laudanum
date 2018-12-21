@@ -6,9 +6,6 @@
 #define FPROJECT_NAMEC "Laudanum"
 #define FPROJECT_NAMEL "laudanum"
 
-// debug logging
-#define FLOG_LEVEL 0
-
 // from:
 // stackoverflow: How to detect reliably Mac OS X, iOS, Linux, Windows in C preprocessor?
 // answer by: Evgeny Gavrin

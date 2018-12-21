@@ -1,10 +1,50 @@
 #include "laudanum/Fwindow.hpp"
 #include "laudanum/FExcept.hpp"
+#include "laudanum/FShader.hpp"
+
+#include <glad/glad.h>
+#include <string>
+
 
 int main(int argc, char* argv[]) {
     auto window = FWindow::create();
 
+    if (window == nullptr)
+        return 1;
+
+    GLuint vao;
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    static const GLfloat vertex_data[] = {
+    -1.0f, -0.5f, 0.0f,
+    1.0f, -0.5f, 0.0f,
+    0.0f,  1.0f, 0.0f,
+    1.0f, 0.5f, 0.0f,
+    -1.0f, 0.5f, 0.0f,
+    0.0f, -1.0f, 0.0f,
+    };
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     for (;;) {
+        glClear(GL_COLOR_BUFFER_BIT);
+
+//        glEnableVertexAttribArray(0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+ //       glDisableVertexAttribArray(0);
+
+        window->draw();
+
         FInputEvent event;
         while (window->getEvent(event)) {
             /**/ if (event.type == FInputType::WIN_CLOSE)
@@ -13,18 +53,6 @@ int main(int argc, char* argv[]) {
                   && event.button == FInputButton::K_ESCAPE 
                   && !FINPUT_HAS_MOD(event.mods, FInputMod::CONTROL))
                   goto cleanup;
-            else if (event.type == FInputType::K_DOWN)
-                FLog("Key down on key: %d w/ mods: %d", event.button, event.mods);
-            else if (event.type == FInputType::K_UP)
-                FLog("Key up on key: %d w/ mods: %d", event.button, event.mods);
-            else if (event.type == FInputType::MB_DOWN)
-                FLog("MB down on button: %d w/ mods: %d", event.button, event.mods);
-            else if (event.type == FInputType::MB_UP)
-                FLog("MB up on button: %d w/ mods: %d", event.button, event.mods);
-            else if (event.type == FInputType::M_MOVE)
-                FLog("Mouse move to (%f, %f)", event.x, event.y);
-            else
-                FLog("Unknown event");
         }
     }
 

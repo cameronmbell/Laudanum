@@ -3,6 +3,9 @@
 
 #include "FDefines.hpp"
 
+// debug logging
+#define FLOG_LEVEL 0
+
 // return state from functions to be overloaded as a bool (char)
 // this is preferred over exceptions because of the performance 
 // implications of the latter

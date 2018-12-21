@@ -8,10 +8,18 @@
 #define FWINDOW_FALLBACK_W 1280
 #define FWINDOW_FALLBACK_H 720
 
+#ifndef FPROJECT_NAMEC
+#define FPROJECT_NAMEC "<app>"
+#endif
+
 std::size_t FWindow::_instance_count = 0;
 
 void glfwErrorCallback(int error_code, const char* description) {
     FErr("GLFW error (%d) %s", error_code, description);
+}
+
+void glfwSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
 // from make_unique and perfect forwarding by Herb Sutter
@@ -58,7 +66,9 @@ std::unique_ptr<FWindow> FWindow::create() {
         glfwWindowHint(GLFW_BLUE_BITS, vidmode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, vidmode->refreshRate);
 
-        window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, monitor, nullptr);
+//      temporary: don't go fullscreen as it makes debugging difficult
+//      window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, monitor, nullptr);
+        window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, nullptr, nullptr);
     }
 
     if (!window) {
@@ -73,6 +83,21 @@ std::unique_ptr<FWindow> FWindow::create() {
 
     // create OpenGL context on main thread
     glfwMakeContextCurrent(window);
+
+    // load the GL extensions
+   if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+       FErr("Unable to load OpenGL from the loader generator (GLAD)");
+
+        glfwDestroyWindow(window);
+        glfwTerminate();
+
+       return nullptr;
+   }
+
+   FLog("Using OpenGL %d.%d", GLVersion.major, GLVersion.minor);
+
+   // set viewport
+   glfwSetFramebufferSizeCallback(window, glfwSizeCallback);
 
     return makeUnique<FWindow>(window);
 }
@@ -91,10 +116,14 @@ FWindow::FWindow(GLFWwindow* window) : _window(window) {
     glfwSetWindowCloseCallback(window, FInputListener::_details::emplaceWindowClose);
 }
 
-bool FWindow::getEvent(FInputEvent& input_event) {
+bool FWindow::getEvent(FInputEvent& input_event) noexcept {
     glfwPollEvents();
 
     return FInputListener::pop(input_event);
+}
+
+void FWindow::draw() noexcept {
+    glfwSwapBuffers(_window);
 }
 
 FWindow::~FWindow() {
