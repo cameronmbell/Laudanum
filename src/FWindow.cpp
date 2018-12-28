@@ -68,7 +68,7 @@ std::unique_ptr<FWindow> FWindow::create() {
 
 //      temporary: don't go fullscreen as it makes debugging difficult
 //      window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, monitor, nullptr);
-        window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, nullptr, nullptr);
+        window = glfwCreateWindow(640, 480, FPROJECT_NAMEC, nullptr, nullptr);
     }
 
     if (!window) {
@@ -84,6 +84,9 @@ std::unique_ptr<FWindow> FWindow::create() {
     // create OpenGL context on main thread
     glfwMakeContextCurrent(window);
 
+   // set viewport
+   glfwSetFramebufferSizeCallback(window, glfwSizeCallback);
+
     // load the GL extensions
    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
        FErr("Unable to load OpenGL from the loader generator (GLAD)");
@@ -95,9 +98,6 @@ std::unique_ptr<FWindow> FWindow::create() {
    }
 
    FLog("Using OpenGL %d.%d", GLVersion.major, GLVersion.minor);
-
-   // set viewport
-   glfwSetFramebufferSizeCallback(window, glfwSizeCallback);
 
     return makeUnique<FWindow>(window);
 }

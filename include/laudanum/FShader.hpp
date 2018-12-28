@@ -4,51 +4,39 @@
 #include "FExcept.hpp"
 
 #include <glad/glad.h>
+#include <list>
 
-#define  FSHADER_COMPILER_ERR_L 1024
+#define FSHADER_COMPILER_ERR_L 1024
 
-#define _FSHADER_TYPES \
-    X(VERTEX) \
-    X(GEOMETRY) \
-    X(FRAGMENT)
+// what type of shader to load
+enum class FShaderType : GLenum;
 
 namespace FShader {
-    enum class Type : GLenum {
-#define X(_n) _n = GL_ ## _n ## _SHADER,
-        _FSHADER_TYPES
-#undef X
-    };
+    // load a shader of type from its source
+    // returns 0 on fail otherwise the shader id
+    GLuint load(FShaderType type, const char* source);
+
+    // link a shader program from a list of compiled shaders
+    // returns 0 on fail otherwise the program id
+    GLuint makeProgram(const std::list<GLuint>& source_list, bool* success_state=nullptr);
 
     namespace _details {
-        constexpr const char* typeToLiteral(Type type) {
-        return 
-#define X(_n) (static_cast<GLenum>(type) == GL_ ## _n ## _SHADER) ? #_n :
-            _FSHADER_TYPES
-            "<unknown";
+        extern char error_buffer [FSHADER_COMPILER_ERR_L];
+
+        constexpr const char* typeToLiteral(FShaderType shader_type) {
+            return 
+            (static_cast<GLenum>(shader_type) == GL_VERTEX_SHADER) ? "VERTEX" :
+            (static_cast<GLenum>(shader_type) == GL_GEOMETRY_SHADER) ? "GEOMETRY" :
+            (static_cast<GLenum>(shader_type) == GL_FRAGMENT_SHADER) ? "FRAGMENT" :
+            "<unknown>";
         }
-    };
-
-    bool load(Type type, GLuint& shader, const char* source) {
-        static char error_buffer [ FSHADER_COMPILER_ERR_L ];
-
-        shader = glCreateShader(static_cast<GLenum>(type));
-
-        glShaderSource(shader, 1, &source, nullptr);
-        glCompileShader(shader);
-
-        int success;
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-        if (!success) {
-            glGetShaderInfoLog(shader, sizeof(error_buffer), nullptr, error_buffer);
-
-            FErr("%s shader failed to compile: \n%s", 
-                _details::typeToLiteral(type),
-                error_buffer);
-        }
-
-        return success;
     }
+};
+
+enum class FShaderType : GLenum {
+    VERTEX=GL_VERTEX_SHADER,
+    GEOMETRY=GL_GEOMETRY_SHADER,
+    FRAGMENT=GL_FRAGMENT_SHADER
 };
 
 #endif

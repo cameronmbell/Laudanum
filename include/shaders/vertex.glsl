@@ -1,5 +1,5 @@
 // By using a C++11 R string the shader comes packaged with the binary
-// This shader runs on every input vertex
+// Hence a recompile is required after changing this file
 
 R""(
 #version 330 core
