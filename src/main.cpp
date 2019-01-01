@@ -1,7 +1,8 @@
 #include "laudanum/Fwindow.hpp"
 #include "laudanum/FExcept.hpp"
-#include "laudanum/FShader.hpp"
+#include "laudanum/Shader.hpp"
 
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 int main(int argc, char* argv[]) {
@@ -11,39 +12,43 @@ int main(int argc, char* argv[]) {
         return 1;
 
     // build the shader program
-    bool build_success;
-    auto shader_program = FShader::makeProgram({
-        FShader::load(FShaderType::VERTEX,
-            #include "shaders/vertex.glsl"
-        ), FShader::load(FShaderType::FRAGMENT,
-            #include "shaders/fragment.glsl"
-        )
-    }, &build_success);
+    auto basic_shader = Shader::makeFromStrings(
+        #include "shaders/vertex.glsl"
+        ,
+        #include "shaders/fragment.glsl"
+    );
 
-    if (build_success == 0)
+    if (!basic_shader)
         return 1;
 
     static const GLfloat vertex_data[] = {
-    -1.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
-    0.0f,  1.0f, 0.0f
+        +0.5f,+0.5f, 0.0f, /* top right */ 1.0f, 0.0f, 0.0f, /* red */
+        +0.5f,-0.5f, 0.0f, /* bot right */ 0.0f, 1.0f, 0.0f, /* green */
+        -0.5f,+0.5f, 0.0f,  /* top left */ 0.0f, 0.0f, 1.0f  /* blue */
+    };
+    static const GLuint element_data[] = {
+        0, 1, 2, /* first tri */
     };
 
     // 1. generate the buffers
-    GLuint vao, vbo;
+    GLuint vao, vbo, ebo;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
 
     // 2. bind the vertex array object and then the vbo
-    // then copy verticies into a vertex buffer
+    // then copy verticies into a vertex buffer and element buffer
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(element_data), element_data, GL_STATIC_DRAW);
 
     // 3. set vertex attrib pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
-//  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,                   0, nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (void*)(0));
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (void*)(3*sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
 
     // 4. unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -53,17 +58,22 @@ int main(int argc, char* argv[]) {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     for (;;) {
-        glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // 1. use shader program
-        glUseProgram(shader_program);
+        basic_shader->use();
+
+        // 1.1 set uniforms
+        auto elapsed_time = glfwGetTime();
+
+        basic_shader->set1f("time", elapsed_time);
 
         // 2. rebind the vao
         glBindVertexArray(vao);
 
-        // 3. draw the vbo
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // 3. draw the vbo based on the ebo (stored in vao)
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         // 4. swap the buffer
         window->draw();

@@ -29,7 +29,7 @@ public:
 
     // Swap the buffer
     void draw() noexcept;
-    
+
     // Destroy the underling GLFW instance
     // and uninitialize GLFW if possible
     ~FWindow();

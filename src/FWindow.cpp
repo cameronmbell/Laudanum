@@ -1,6 +1,7 @@
 #include "laudanum/Fwindow.hpp"
 #include "laudanum/Fexcept.hpp"
 #include "laudanum/FDefines.hpp"
+#include "laudanum/FStandard.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -20,12 +21,6 @@ void glfwErrorCallback(int error_code, const char* description) {
 
 void glfwSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
-}
-
-// from make_unique and perfect forwarding by Herb Sutter
-template<typename T, typename... Args>
-std::unique_ptr<T> makeUnique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 std::unique_ptr<FWindow> FWindow::create() {
@@ -99,7 +94,7 @@ std::unique_ptr<FWindow> FWindow::create() {
 
    FLog("Using OpenGL %d.%d", GLVersion.major, GLVersion.minor);
 
-    return makeUnique<FWindow>(window);
+    return FStandard::makeUnique<FWindow>(window);
 }
 
 FWindow::FWindow(GLFWwindow* window) : _window(window) {
