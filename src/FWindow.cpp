@@ -60,6 +60,7 @@ std::unique_ptr<FWindow> FWindow::create() {
         glfwWindowHint(GLFW_GREEN_BITS, vidmode->greenBits);
         glfwWindowHint(GLFW_BLUE_BITS, vidmode->blueBits);
         glfwWindowHint(GLFW_REFRESH_RATE, vidmode->refreshRate);
+        glfwWindowHint(GLFW_SRGB_CAPABLE, true);
 
 //      temporary: don't go fullscreen as it makes debugging difficult
 //      window = glfwCreateWindow(vidmode->width, vidmode->height, FPROJECT_NAMEC, monitor, nullptr);

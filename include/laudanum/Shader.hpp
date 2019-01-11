@@ -4,6 +4,9 @@
 #include "FStandard.hpp"
 #include "FShader.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <memory>
 
 // Handle a compiled OpenGL shader program within it's own instance
@@ -53,15 +56,16 @@ struct Shader {
     );
 
     // Tell OpenGL to make this shader the current one in use
-    inline void use() const {
-        glUseProgram(ID);
-    }
+    inline void use() const 
+    { glUseProgram(ID); }
 
     // Set uniform variables
     inline void set1f(const char* key, GLfloat value) const
     { glUniform1f(glGetUniformLocation(ID, key), value); }
     inline void set1i(const char* key, GLint value) const
     { glUniform1i(glGetUniformLocation(ID, key), value); }
+    inline void setMatrix4x4(const char* key, const glm::mat4& value) const 
+    { glUniformMatrix4fv(glGetUniformLocation(ID, key), 1, GL_FALSE, glm::value_ptr(value)); }
 };
 
 #endif

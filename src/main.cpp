@@ -5,6 +5,13 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/std_image.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 int main(int argc, char* argv[]) {
     auto window = FWindow::create();
 
@@ -22,12 +29,15 @@ int main(int argc, char* argv[]) {
         return 1;
 
     static const GLfloat vertex_data[] = {
-        +0.5f,+0.5f, 0.0f, /* top right */ 1.0f, 0.0f, 0.0f, /* red */
-        +0.5f,-0.5f, 0.0f, /* bot right */ 0.0f, 1.0f, 0.0f, /* green */
-        -0.5f,+0.5f, 0.0f,  /* top left */ 0.0f, 0.0f, 1.0f  /* blue */
+        +1.0f,+1.0f,0.0f, /* top right */ 1.0f, 1.0f,
+        +1.0f,-1.0f,0.0f, /* bot right */ 1.0f, 0.0f,
+        -1.0f,-1.0f,0.0f,  /* bot left */ 0.0f, 0.0f,
+        -1.0f,+1.0f,0.0f,  /* top left */ 0.0f, 1.0f
     };
+
     static const GLuint element_data[] = {
         0, 1, 2, /* first tri */
+        2, 0, 3, /* secnd tri */
     };
 
     // 1. generate the buffers
@@ -45,29 +55,62 @@ int main(int argc, char* argv[]) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(element_data), element_data, GL_STATIC_DRAW);
 
     // 3. set vertex attrib pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (void*)(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*5, (void*)(0));
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (void*)(3*sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*5, (void*)(3*sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     // 4. unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    GLuint texture0;
+    glGenTextures(1, &texture0);
+    glBindTexture(GL_TEXTURE_2D, texture0);
+
+    int width, height, bits;
+    stbi_set_flip_vertically_on_load(true);
+    auto portrait_data = stbi_load("res/portrait0.jpg", &width, &height, &bits, 0);
+    FLog("Read texture: portrait0.jpg of %dx%d and depth %d", width, height, bits);
+
+    FAssert(portrait_data);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, portrait_data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    stbi_image_free(portrait_data);
+
     // enable wireframe rendering
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // connect texture units
+    basic_shader->use();
+    basic_shader->set1i("texture0", 0);
 
     for (;;) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // 0. bind texture units
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture0);
+
         // 1. use shader program
         basic_shader->use();
 
         // 1.1 set uniforms
-        auto elapsed_time = glfwGetTime();
+        float elapsed_time = static_cast<float>(glfwGetTime());
+        glm::mat4 trans_mat = glm::mat4(1.0f);
+        trans_mat = glm::scale(trans_mat, glm::vec3(0.5f));
+        trans_mat = glm::translate(trans_mat, glm::vec3(std::sin(elapsed_time), std::cos(elapsed_time), 0.0f));
+        trans_mat = glm::rotate(trans_mat, elapsed_time * FStandard::m_pif(0.25f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-        basic_shader->set1f("time", elapsed_time);
+        basic_shader->setMatrix4x4("uTransform", trans_mat);
 
         // 2. rebind the vao
         glBindVertexArray(vao);

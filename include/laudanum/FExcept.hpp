@@ -5,6 +5,7 @@
 
 // debug logging
 #define FLOG_LEVEL 0
+#define FDEBUG
 
 // return state from functions to be overloaded as a bool (char)
 // this is preferred over exceptions because of the performance 
@@ -27,6 +28,9 @@ enum FState : char {
 namespace _details {
     // log to stdout: "[current_time] [precursor_text] fmt..."
     void FRawLog(const char* precursor_text, const char* fmt, ...) FPRINTF_HINT(2, 3);
+
+    // log assertion and kill
+    void FRawAssert(int line, const char* file, const char* function, const char* expression);
 };
 
 #if !defined(FLOG_LEVEL) || FLOG_LEVEL < 1
@@ -37,6 +41,12 @@ namespace _details {
 #endif
 #if !defined(FLOG_LEVEL) || FLOG_LEVEL < 3
 #define FErr(f_, ...)   ::_details::FRawLog("ERR ", (f_), ##__VA_ARGS__)
+#endif
+
+#if !defined(FDEBUG)
+#define FAssert(expr) ((void)0)
+#else
+#define FAssert(expr) ((expr)? (void)0 : ::_details::FRawAssert(__LINE__, "/" __FILE__, FFUNC, #expr))
 #endif
 
 #endif

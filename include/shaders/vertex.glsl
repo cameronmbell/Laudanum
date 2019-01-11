@@ -1,18 +1,16 @@
-// By using a C++11 R string the shader comes packaged with the binary
-// Hence a recompile is required after changing this file
+R""(#version 330 core
 
-R""(
-#version 330 core
+layout (location = 0) in vec3 vVPos;
+layout (location = 1) in vec2 vTexCoord;
 
-layout (location = 0) in vec3 pos;
-layout (location = 1) in vec3 col;
+uniform mat4 uTransform;
 
-out vec3 vCol;
-
-uniform float time;
+out vec2 fTexCoord;
 
 void main() {
-    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0) + 0.1 * time;
-    vCol = col;
-}
-)""
+    gl_Position = uTransform * vec4(vVPos, 1.0f);
+    fTexCoord = vTexCoord;
+})""
+
+// By using a C++11 R string the shader comes packaged with the binary
+// Hence a recompile is required after changing this file

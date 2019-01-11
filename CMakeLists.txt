@@ -63,3 +63,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 # use c++11 standard
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+
+# copy resources
+# set (RES_DIR "${CMAKE_SOURCE_DIR}/res")
+# set (RES_DEST "${CMAKE_CURRENT_BINARY_DIR}/res")
+# add_custom_command(
+#     TARGET ${PROJECT_NAME} POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E create_symlink ${RES_DIR} ${RES_DEST} 
+#     DEPENDS ${RES_DEST}
+#     COMMENT "symbolic link resources folder from ${RES_DIR} => ${RES_DEST}"
+# )
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res)

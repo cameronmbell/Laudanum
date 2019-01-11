@@ -57,4 +57,23 @@
 #define FCMP_ORACLE
 #endif
 
+// function macro
+#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+# define FFUNC __PRETTY_FUNCTION__
+#elif defined(__DMC__) && (__DMC__ >= 0x810)
+# define FFUNC __PRETTY_FUNCTION__
+#elif defined(__FUNCSIG__)
+# define FFUNC __FUNCSIG__
+#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+# define FFUNC __FUNCTION__
+#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+# define FFUNC __FUNC__
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+# define FFUNC __func__
+#elif defined(__cplusplus) && (__cplusplus >= 201103)
+# define FFUNC __func__
+#else
+#define FFUNC "<anonymous>"
+#endif
+
 #endif
