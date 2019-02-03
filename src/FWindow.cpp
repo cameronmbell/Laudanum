@@ -1,4 +1,4 @@
-#include "laudanum/Fwindow.hpp"
+#include "laudanum/FWindow.hpp"
 #include "laudanum/FExcept.hpp"
 #include "laudanum/FDefines.hpp"
 #include "laudanum/FStandard.hpp"
