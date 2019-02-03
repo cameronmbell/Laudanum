@@ -1,4 +1,4 @@
-#include "laudanum/Fexcept.hpp"
+#include <laudanum/FExcept.hpp>
 
 #include <ctime>
 #include <cstring>
