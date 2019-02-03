@@ -1,7 +1,7 @@
 #ifndef _F_WINDOW_HPP
 #define _F_WINDOW_HPP
 
-#include "Fexcept.hpp"
+#include "FExcept.hpp"
 #include "FInputListener.hpp"
 
 #include <memory>
