@@ -9,15 +9,15 @@
 
 set(GLFW3_SEARCH_PATHS ${DEPENDENCIES_ROOT})
 
-find_path(GLFW3_INCLUDE_DIR 
-    NAMES GLFW/glfw3.h 
-    PATHS ${GLFW3_SEARCH_PATHS} 
+find_path(GLFW3_INCLUDE_DIR
+    NAMES GLFW/glfw3.h
+    PATHS ${GLFW3_SEARCH_PATHS}
     PATH_SUFFIXES include)
 
-find_library(GLFW3_LIBRARY 
+find_library(GLFW3_LIBRARY
     NAMES glfw3
     PATHS ${GLFW3_SEARCH_PATHS}
-    PATH_SUFFIXES lib)
+  PATH_SUFFIXES lib_dll)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GLFW DEFAULT_MSG GLFW3_LIBRARY GLFW3_INCLUDE_DIR)
